@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ms. Mia's English Class - Unit 5</title>
+    <style>
+        :root {
+            --bg-color: #fdf5e6;
+            --accent-color: #ff9a9e;
+            --text-color: #4a4a4a;
+            --highlight-color: #fff176;
+            --button-bg: #ffffff;
+            --active-button: #8ed1fc;
+            --shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(#ffe4b5 10%, transparent 10%),
+                linear-gradient(135deg, #fdf5e6 0%, #ffecd2 100%);
+            background-size: 30px 30px, 100% 100%;
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Sidebar Navigation */
+        #sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            border-right: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        #logo-container {
+            position: sticky;
+            top: 0;
+            padding: 20px 10px;
+            text-align: center;
+            background: transparent;
+        }
+
+        #logo-container img {
+            max-width: 160px;
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: #d4a373;
+            text-align: center;
+            margin: 5px 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #button-list-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 15px 20px 15px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .story-btn {
+            width: 100%;
+            background: var(--button-bg);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .story-btn.active {
+            background: var(--active-button);
+            color: white;
+            border-color: #0693e3;
+        }
+
+        /* Main Reading Area */
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .instruction {
+            text-align: center;
+            font-weight: bold;
+            color: #b5835a;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        #reading-box {
+            background: rgba(255, 255, 255, 0.92);
+            flex: 1;
+            border-radius: 35px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            line-height: 1.7;
+            font-size: 2.1rem;
+            overflow-y: auto;
+            border: 6px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .word {
+            display: inline-block;
+            cursor: pointer;
+            padding: 0 4px;
+            border-radius: 8px;
+            transition: background 0.1s;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .word.playing {
+            background: var(--highlight-color) !important;
+            transform: scale(1.1);
+        }
+
+        /* Mobile Layout Adjustments */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            #sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 35vh;
+                border-right: none;
+                border-bottom: 2px solid white;
+            }
+            #logo-container { padding: 10px; }
+            #logo-container img { max-width: 100px; }
+            h2 { font-size: 1rem; margin: 0 0 5px 0; }
+            #button-list-wrapper {
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 10px;
+                gap: 10px;
+            }
+            .story-btn {
+                width: auto;
+                white-space: nowrap;
+                margin-bottom: 0;
+                padding: 8px 12px;
+            }
+            #main-content { padding: 15px; }
+            #reading-box { font-size: 1.5rem; padding: 20px; border-radius: 20px; }
+            .instruction { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav id="sidebar">
+        <div id="logo-container">
+            <img src="logo.png" alt="Ms. Mia Logo">
+        </div>
+        <h2>Unit 5</h2>
+        <div id="button-list-wrapper">
+            <div id="button-list"></div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <div class="instruction">💻 Click a word | 📱 Double-tap a word</div>
+        <div id="reading-box"></div>
+    </main>
+
+    <script>
+        const stories = [
+            { title: "1. Two Little Apples", text: "Two little apples were hanging on a tree.\nTwo little apples were smiling at me.\nI shook that tree as hard as I could.\nDown came the apples!\nM-m-m, they were good!" },
+            { title: "2. I See Numbers", text: "I see numbers on the wall,\nnumbers short and numbers tall.\nNumbers in my storybook—\nnumbers everywhere I look.\n\nHow many lemons do you see?\nHow many cherries do you see?\nHow many pies do you see?\nHow many flowers do you see?\nHow many seeds do you see?\n\nHow many pies do you see?\nHow many lemons do you see?\nHow many seeds do you see?\nHow many cherries do you see?\nHow many flowers do you see?" },
+            { title: "3. Pumpkin", text: "Pumpkin, pumpkin, big and round,\nI’m glad you grow upon the ground.\nI’m glad you don’t grow in a tree,\nfor then you could fall down on me!" },
+            { title: "4. Great Round Ball", text: "Watermelon on the ground,\nhow did you get so big and round?\nYou started as a seed so small.\nNow you are a great round ball.\n\nWatermelon on the ground,\nhow did you get so big and round?" },
+            { title: "5. Just Like Me!", text: "Everybody shake hands,\nshake hands, shake hands.\nEverybody shake hands, just like me!\n\nEverybody tiptoe, tiptoe, tiptoe.\nEverybody tiptoe, just like me!\n\nEverybody dance fast,\ndance fast, dance fast.\nEverybody dance fast, just like me!\n\nEverybody dance slow,\ndance slow, dance slow.\nEverybody dance slow, just like me!\n\nEverybody stomp feet,\nstomp feet, stomp feet.\nEverybody stomp feet, just like me!\n\nEverybody wave hands,\nwave hands, wave hands.\nEverybody wave hands, just like me!\n\nEverybody wiggle, wiggle, wiggle.\nEverybody wiggle, just like me!\n\nEverybody sit down,\nsit down, sit down.\nEverybody sit down, just like me!" },
+            { title: "6. Jack-O’-Lantern", text: "Jack-o’-lantern, Jack-o’-lantern,\nyou are such a funny light,\nas you sit there in the window,\nlooking out at the night." },
+            { title: "7. You and Me", text: "Under the great big chestnut tree,\nthere we sat, both you and me.\nOh, how happy we would be,\nunder the great big chestnut tree." },
+            { title: "8. Yes, I Am!", text: "What are you? Are you a grape?\nNo, I’m not. I am not.\nAre you a banana?\nYes, I am. I am a banana!\n\nWhat are you? Are you a bean?\nNo, I’m not. I am not.\nAre you a cucumber?\nYes, I am. I am a cucumber!\n\nWhat are you? Are you a pear?\nNo, I’m not. I am not.\nAre you a pineapple?\nYes, I am. I am a pineapple!\n\nWhat are you? Are you a cherry?\nNo, I’m not. I am not.\nAre you a strawberry?\nYes, I am. I am a strawberry!\n\nWhat are you? Are you a kiwi?\nNo, I’m not. I am not.\nAre you a potato?\nYes, I am. I am a potato!\n\nWhat are you? Are you a lemon?\nNo, I’m not. I am not.\nAre you a tomato?\nYes, I am. I am a tomato!" },
+            { title: "9. Let’s Climb", text: "This is how elephants walk.\nLet’s walk.\nWalk, walk, walk.\nAnd stop.\n\nThis is how zebras run.\nLet’s run.\nRun, run, run.\nLet’s stop.\n\nThis is how alligators crawl.\nLet’s crawl.\nCrawl, crawl, crawl.\nNow, let’s stop!\n\nThis is how monkeys climb.\nLet’s climb.\nClimb, climb, climb.\nAnd stop.\n\nThis is how rabbits hop.\nLet’s hop.\nHop, hop, hop.\nNow, stop.\n\nThis is how birds fly.\nLet’s fly.\nFly, fly, fly.\nLet’s stop.\n\nThis is how kangaroos jump.\nLet’s jump.\nJump, jump, jump.\nNow, stop." },
+            { title: "10. Apples", text: "Apples, apples\nin a tree,\none fell down,\njust for me!" },
+            { title: "11. My Watermelon", text: "You can see peaches\nup in the tree,\nbut you can’t see\nthe watermelon\ninside me!" },
+            { title: "12. Quiet!", text: "“Quack, quack!” said\nthe little ducks.\n\n“Be quiet!” said\ntheir mother.\n\n“You may play\nbut be quiet.\nYou must not\nwake your\nbrother.”" },
+            { title: "13. Orange", text: "Orange is\nthe butterfly.\nOrange is\nthe fox.\n\nOrange is\nthe jump rope.\nOrange is\nthe box.\n\nOrange is\nthe caterpillar.\nOrange is\nthe bee.\n\nOrange is\nthe ice cream\nthat’s all over\nme!" },
+            { title: "14. Five", text: "Five red\ncherries,\nfive purple\ngrapes,\n\nfive yellow\nlemons on\na plate.\n\nFive bananas,\nfive green\napples too,\n\nlots of fruit for\nme and you!" },
+            { title: "15. Party in the Barn", text: "It is time for the big party.\nAll the fruits and vegetables are coming.\nSome live near the barn,\nand some live far away.\n\nThe farmer put new hay on the floor of the barn.\nHe grew many orange flowers\nand put them in boxes.\n\nPumpkin plays an old piano.\nKiwi, Peach, Broccoli, and Watermelon sing.\nThey sing all night long.\n\nTall green Cucumber and short red Tomato dance.\nBig yellow Banana and small green Grape dance too.\nBanana moves slowly.\nGrape must move fast!\n\nLettuce and Cabbage pull Orange to the top of the hill.\nCherry rides with Orange to the bottom of the hill.\n\nApple, Lemon, Pear, and Potato go to hide.\nLittle Black Beans go to find them.\nPineapple pushes Corn on the swing.\n\nOnion is dirty and sad.\nNo one wants to play with her.\n\nNice Strawberry says, “Let’s go swimming!”\nOnion smiles.\nNow she is clean and happy.\n\nMelon and Carrot cut the pie.\nAll the fruits and vegetables have some to eat.\nBut nobody eats the seeds.\nDo you know why?" },
+            { title: "16. Me, Too!", text: "Don and John were friends.\nDon was a big beet and John was a little beet.\n\nOne day, Don and John went out for a walk.\nJohn was always behind Don.\nDon walked fast, and John walked slow.\n“Wait for me!” called John.\n\nThe two beets walked uphill and downhill.\nThey walked here and there.\nThey walked near and far.\n\nAs they walked, Don said,\n“I am glad you are my friend.”\n\n“Me, too!” said John.\n“Nobody has such a good friend as you.”\n\n“And those other beets don’t have a friend like you,” said Don.\n\n“Help!” someone yelled.\n“We’re over here!”\n\n“Look over there!” said Don.\n“Let’s see if we can help!”\n\n“I’ve never seen so much mud!” said Don.\n“I’ll help you, Mrs. Broccoli!”\n\n“Me, too!” said John.\n\nThey pushed on the car.\nThey pulled on the car.\nWooosh!\nThe mud let go of the car!\nWhew!\nThat was hard work!\n\n“Now we are all dirty!” said Don.\n“And I’m thirsty!”\n\n“Me, too!” said John.\n“Look, there’s some water.”\n\nSo the beets got a drink.\nAnd they got clean too!\n\n“Now I’m hungry,” said Don.\n\n“Me, too!” said John.\n\n“I live near here,” said Mrs. Broccoli.\n“I will make you some dinner!”\n\n“Go in and sit down.”\n\n“My chair is too small for me,” said Don.\n“My chair is too big for me,” said John.\n\n“Well, Don,” said Mrs. Broccoli,\n“why don’t you sit in John’s chair?\nAnd, John, why don’t you sit in Don’s chair?”\n\nDon and John looked at each other.\n“Yes, let’s do that!\nThen the chairs will be just right!”\n\n“Thank you for dinner, Mrs. Broccoli.\nGoodbye!”\n\nThe boys waved to Mrs. Broccoli\nand to all the little Broccolis.\n\n“I’m walking back home again,” said Don.\n“And then I’m going to bed!”\n\n“Me, too!” said John." },
+            { title: "17. Everybody Grows", text: "Every baby is so small.\nThen he grows so very tall.\nOther things grow, too, you see.\nThat’s the way it looks to me!\n\nPut a seed down in the ground.\nWatch it grow up big and round.\nGive it water and you’ll say,\n“It’s getting bigger every day!”\n\nEverybody knows that everybody grows.\nEverybody grows and everybody knows—\nsome grow small and some grow tall,\nbut everybody grows!\n\nCorn grows up to the sky.\nApples grow on trees so high.\nMelons grow green and round.\nCarrots grow down in the ground.\n\nEverybody knows that everybody grows.\nEverybody grows and everybody knows—\nsome grow small and some grow tall,\nbut everybody grows!\n\nBabies grow and little chicks grow.\nGoats and pigs and birdies grow.\nVegetables grow and sit around!\nTrees grow up and fruit grows out.\n\nEverybody knows that everybody grows.\nEverybody grows and everybody knows—\nsome grow small and some grow tall,\nbut everybody grows!" },
+            { title: "18. This and That", text: "This is a pear.\nAnd that’s a beet,\nand that is a tomato.\n\nThis is a peach.\nThat’s an orange,\nand that is a potato.\n\nThis is a bean.\nThat’s a melon,\nand that is a pineapple.\n\nThis is a grape.\nThat’s a kiwi,\nand that is a red apple.\n\nThis is cabbage.\nThat’s an onion,\nand that is a strawberry.\n\nThis is corn.\nThat’s a carrot,\nand that is a black cherry.\n\nThis is lettuce.\nThat’s a cucumber,\nand that is watermelon.\n\nThis is broccoli.\nThat’s a banana,\nand that is a yellow lemon.\n\nNow this is a pumpkin,\nand these are vegetables,\nand those are fruit!" },
+            { title: "19. Jonny Bear Makes New Friends", text: "Jonny Bear goes out to play.\n\n“Jonny, do not play in the rain,”\nMother Bear said to him.\n“And come home when it’s time for dinner.”\n\n“Yes, Mother. I’m going to look everywhere,” says Jonny.\n\nAnd so he walks up the hill.\nHe goes far away from home.\n\nJonny sees many bugs.\n\n“Good morning, Miss Caterpillar,” he says.\n\n“Good morning, Jonny.”\n\nThen Jonny sees bees and a beehive.\nJonny puts his hand into the hive.\nThe bees buzz around Jonny’s head.\nThey are not happy!\n\nJonny looks up into the trees.\nHe sees a crow and an owl.\nHe sees a spider sitting on her web.\n\nThen Jonny comes to a farm.\nHe sees a farmer standing near a barn.\n\n“Hello, little bear. Welcome to my farm.”\n\n“What do you have on your farm?”\nJonny says to the farmer.\n\n“I have many animals on my farm.\nPlease look around.”\n\nJonny sees some mice eating seeds.\nHe sees a cow and sheep.\nHe sees a pig near the barn.\nJonny has never seen so many animals before.\n\nJonny pulls some carrots out of the ground.\nThe carrots are dirty, but Jonny cleans them.\n\nHe gives the carrots to a goat,\nan old donkey,\na horse,\nand a little pony.\n\nA cat is cleaning her tail.\nA dog is sitting in the sun.\nThe dog is sad.\nHe wants to play.\n\n“You hide and I will come and find you!” said Jonny.\n\n“There you are!\nI found you!”\n\nThere are birds on the farm, too.\nJonny sees ducks and little chicks.\nHe sees a tall ostrich.\n\n“Help me!” the chicken shouts.\n“I cannot find my egg!”\n\nJonny wants to help Mrs. Chicken.\nHe pushes open the door.\nHe looks all around.\nAnd there it is—on the ground!\n\nNow all the animals like Jonny.\nThey know that he is a nice bear.\n\n“I’m glad I came to the farm today.\nI had fun, and now I have many new friends,” said Jonny.\n\n“And we have a new friend too Blunt,” said all the animals." }
+        ];
+
+        const buttonList = document.getElementById('button-list');
+        const readingBox = document.getElementById('reading-box');
+        const synth = window.speechSynthesis;
+        let preferredVoice = null;
+        let speechAllowed = false;
+
+        function setPreferredVoice() {
+            const voices = synth.getVoices();
+            preferredVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Google') || v.name.includes('Samantha'))) || 
+                             voices.find(v => v.lang === 'en-US') || 
+                             voices[0];
+        }
+
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = setPreferredVoice;
+        }
+
+        function enableAudioOniOS() {
+            if (!speechAllowed) {
+                const initialUtterance = new SpeechSynthesisUtterance("");
+                synth.speak(initialUtterance);
+                speechAllowed = true;
+            }
+        }
+        
+        document.body.addEventListener('touchstart', enableAudioOniOS, { passive: true });
+        document.body.addEventListener('click', enableAudioOniOS);
+
+        function init() {
+            buttonList.innerHTML = '';
+            stories.forEach((story, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'story-btn';
+                btn.innerText = story.title;
+                btn.onclick = () => loadStory(index);
+                buttonList.appendChild(btn);
+            });
+            loadStory(0);
+            setPreferredVoice();
+        }
+
+        function loadStory(index) {
+            const buttons = document.querySelectorAll('.story-btn');
+            buttons.forEach((btn, i) => btn.classList.toggle('active', i === index));
+
+            readingBox.innerHTML = '';
+            const lines = stories[index].text.split('\n');
+
+            lines.forEach(line => {
+                if (line.trim() === "") {
+                    readingBox.appendChild(document.createElement('br'));
+                    return;
+                }
+                const lineDiv = document.createElement('div');
+                const parts = line.split(/(\s+)/); 
+
+                parts.forEach(part => {
+                    if (part.trim() === "") {
+                        lineDiv.appendChild(document.createTextNode(part));
+                    } else {
+                        const span = document.createElement('span');
+                        span.className = 'word';
+                        span.innerText = part;
+
+                        let lastTap = 0;
+
+                        // Touch Path for Mobile Devices
+                        span.addEventListener('touchend', function(e) {
+                            const currentTime = new Date().getTime();
+                            const tapLength = currentTime - lastTap;
+                            if (tapLength < 300 && tapLength > 0) {
+                                e.preventDefault();
+                                speak(part, span);
+                            }
+                            lastTap = currentTime;
+                        });
+
+                        // Click Path for Desktop
+                        span.addEventListener('click', function(e) {
+                            if (e.pointerType !== 'touch') {
+                                speak(part, span);
+                            }
+                        });
+
+                        span.addEventListener('contextmenu', e => e.preventDefault());
+                        lineDiv.appendChild(span);
+                    }
+                });
+                readingBox.appendChild(lineDiv);
+            });
+            readingBox.scrollTop = 0;
+        }
+
+        function speak(word, element) {
+            document.querySelectorAll('.word.playing').forEach(el => el.classList.remove('playing'));
+            synth.cancel();
+
+            const cleanWord = word.replace(/[.,!?;:“”’\"“\"]/g, "");
+            const utterance = new SpeechSynthesisUtterance(cleanWord);
+            
+            utterance.rate = 0.65; 
+            utterance.pitch = 1.1;
+            
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            } else {
+                utterance.lang = 'en-US';
+            }
+
+            utterance.onstart = () => element.classList.add('playing');
+            utterance.onend = () => element.classList.remove('playing');
+            
+            synth.speak(utterance);
+        }
+
+        init();
+    </script>
+</body>
+</html>
